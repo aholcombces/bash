@@ -1,6 +1,6 @@
 #!/bin/bash
 # written by: atholcomb
-# rds_modify.sh
+# try.sh
 # calls awscli - removes old database instance and restores a new instance from a specified snapshot
 
 echo -n "What is the name of the database (db-identifier): "
