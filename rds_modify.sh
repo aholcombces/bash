@@ -17,9 +17,9 @@ fi
 # Check snapshot info
 echo "Lastest snapshot info:"
 aws rds describe-db-snapshots --db-snapshot-identifier testsnapshot | grep -i "InstanceCreateTime"
-aws rds describe-db-snapshots --db-snapshot-identifier testsnapshot | grep -i  "SnapshotCreateTime"
-aws rds describe-db-snapshots --db-snapshot-identifier testsnapshot | grep -i  "DBInstanceIdentifier"
-aws rds describe-db-snapshots --db-snapshot-identifier testsnapshot | grep -i  "DBSnapshotIdentifier"
+aws rds describe-db-snapshots --db-snapshot-identifier testsnapshot | grep -i "SnapshotCreateTime"
+aws rds describe-db-snapshots --db-snapshot-identifier testsnapshot | grep -i "DBInstanceIdentifier"
+aws rds describe-db-snapshots --db-snapshot-identifier testsnapshot | grep -i "DBSnapshotIdentifier"
 aws rds describe-db-snapshots --db-snapshot-identifier testsnapshot | grep -i "Engine"
 aws rds describe-db-snapshots --db-snapshot-identifier testsnapshot | grep -i "Status"
 
