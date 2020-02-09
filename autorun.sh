@@ -64,7 +64,9 @@ echo
 
 # Check if new database is available
 echo "Checking if $dbname is available..."
+echo
 echo "This process can take a while. Please wait."
+echo
 while :
 do
     dbstatus=$(aws rds describe-db-instances --db-instance-identifier $dbname | grep -i "DBInstanceStatus")
@@ -76,6 +78,5 @@ do
 done
 
 # Stop new database instance (if aim is to save cost in non-prod)
-#echo
-#echo "Stopping database $dbname ..."
-#aws rds stop-db-instance --db-instance-identifier $dbname | grep -i "DBInstanceStatus"
+echo "Stopping database $dbname ..."
+aws rds stop-db-instance --db-instance-identifier $dbname | grep -i "DBInstanceStatus"
