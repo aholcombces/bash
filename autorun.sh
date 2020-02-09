@@ -13,16 +13,8 @@ latestsnapshot=$(aws rds describe-db-snapshots --db-instance-identifier=$dbname 
 #latestsnapshot=$(aws rds describe-db-snapshots --db-instance-identifier=$dbname --query="reverse(sort_by(DBSnapshots, &SnapshotCreateTime))[0] | DBSnapshotArn" --output text)
 
 # Check database status
-check_db_instance=$(aws rds describe-db-instances --db-instance-identifier $dbname | grep -i "DBInstanceStatus")
-
-#if [[ $check_db_instance == $check_db_instance ]]; then
-if [[ -n "$check_db_instance" ]]; then
-    echo "Database is up and running"
-    aws rds describe-db-instances --db-instance-identifier $dbname | grep -i "DBInstanceStatus"
-else
-    echo "No database $dbname"
-    exit 1
-fi
+echo "Database status..."
+aws rds describe-db-instances --db-instance-identifier $dbname | grep -i "DBInstanceStatus"
 
 # Check snapshot info
 echo
@@ -48,7 +40,7 @@ while :
 do
     dboutput=$(aws rds describe-db-instances --query 'DBInstances[*].[DBName,DBInstanceIdentifier]' --filters Name=db-instance-id,Values=$dbname --output text)
     if  [ "$dboutput" == '' ]; then 
-        echo "Database has been removed."
+        echo "##Database has been removed.##"
         break
     fi 
 done
@@ -64,7 +56,6 @@ echo
 
 # Check if new database is available
 echo "Checking if $dbname is available..."
-echo
 echo "This process can take a while. Please wait."
 echo
 while :
@@ -72,11 +63,13 @@ do
     dbstatus=$(aws rds describe-db-instances --db-instance-identifier $dbname | grep -i "DBInstanceStatus")
     dbavailable=$(aws rds describe-db-instances --db-instance-identifier $dbname | grep -i "DBInstanceStatus" | grep -i "available")
     if [[ "$dbstatus" == $dbavailable ]]; then
-        echo "Database $dbname is available"
+        echo "##Database $dbname is available##"
         break
     fi
 done
 
 # Stop new database instance (if aim is to save cost in non-prod)
+echo
 echo "Stopping database $dbname ..."
 aws rds stop-db-instance --db-instance-identifier $dbname | grep -i "DBInstanceStatus"
+echo
