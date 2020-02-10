@@ -45,7 +45,7 @@ do
     dboutput=$(aws rds describe-db-instances --query 'DBInstances[*].[DBName,DBInstanceIdentifier]' --filters Name=db-instance-id,Values=$dbname --output text)
     if  [ "$dboutput" == '' ]; then 
         echo "-------------------------"
-        echo "Database has been removed."
+        echo "$dbname has been removed."
         echo "-------------------------"
         break
     fi 
@@ -70,7 +70,7 @@ do
     dbavailable=$(aws rds describe-db-instances --db-instance-identifier $dbname | grep -i "DBInstanceStatus" | grep -i "available")
     if [[ "$dbstatus" == $dbavailable ]]; then
         echo "-----------------------------"
-        echo "Database $dbname is available"
+        echo "$dbname is available"
         echo "-----------------------------"
         break
     fi
