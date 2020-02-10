@@ -4,7 +4,7 @@
 # calls awscli - removes old database instance and restores a new database instance from a specified snapshot
 
 # save output in cron job to output file
-# /path/to/your/script.sh > output.txt
+# /path/to/your/script.sh &> output.txt
 
 echo "Date ran: $(date)"
 
@@ -28,7 +28,7 @@ aws rds describe-db-snapshots --db-snapshot-identifier $latestsnapshot | grep -i
 
 # Delete database instance #| --final-db-snapshot-identifier <value>
 echo
-echo "$dbname will be deleted"
+echo "Deleting $dbname so restore can begin..."
 aws rds delete-db-instance --db-instance-identifier $dbname --skip-final-snapshot | grep -i "DBInstanceStatus"
 
 # Check if database instance has been removed from Console
@@ -40,7 +40,9 @@ while :
 do
     dboutput=$(aws rds describe-db-instances --query 'DBInstances[*].[DBName,DBInstanceIdentifier]' --filters Name=db-instance-id,Values=$dbname --output text)
     if  [ "$dboutput" == '' ]; then 
-        echo "##Database has been removed.##"
+        echo "-------------------------"
+        echo "Database has been removed."
+        echo "-------------------------"
         break
     fi 
 done
@@ -50,12 +52,12 @@ done
 # --vpc-security-group-ids
 # --availability-zone us-east-2b
 echo
-echo "database $dbname will be created from snapshot $latestsnapshot"
+echo "Creating $dbname from restored snapshot id: $latestsnapshot"
 aws rds restore-db-instance-from-db-snapshot --db-snapshot-identifier $latestsnapshot --db-instance-identifier $dbname | grep -i "DBInstanceStatus"
 echo
 
 # Check if new database is available
-echo "Checking if $dbname is available..."
+echo "Checking if $dbname is available and online..."
 echo "This process can take a while. Please wait."
 echo
 while :
@@ -63,12 +65,15 @@ do
     dbstatus=$(aws rds describe-db-instances --db-instance-identifier $dbname | grep -i "DBInstanceStatus")
     dbavailable=$(aws rds describe-db-instances --db-instance-identifier $dbname | grep -i "DBInstanceStatus" | grep -i "available")
     if [[ "$dbstatus" == $dbavailable ]]; then
-        echo "##Database $dbname is available##"
+        echo "-----------------------------"
+        echo "Database $dbname is available"
+        echo "-----------------------------"
         break
     fi
 done
 
 # Stop new database instance (if aim is to save cost in non-prod)
+sleep(5)
 echo
 echo "Stopping database $dbname ..."
 aws rds stop-db-instance --db-instance-identifier $dbname | grep -i "DBInstanceStatus"
