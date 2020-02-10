@@ -6,7 +6,7 @@
 # save output in cron job to output file
 # /path/to/your/script.sh &> output.txt
 
-# measure the time the script takes to run
+# Measure the time the script takes to run -- look at $duration below
 SECONDS=0
 
 echo "Date ran: $(date)"
