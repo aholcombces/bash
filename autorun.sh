@@ -6,7 +6,11 @@
 # save output in cron job to output file
 # /path/to/your/script.sh &> output.txt
 
+# measure the time the script takes to run
+SECONDS=0
+
 echo "Date ran: $(date)"
+echo
 
 dbname=$1
 latestsnapshot=$(aws rds describe-db-snapshots --db-instance-identifier=$dbname --query="reverse(sort_by(DBSnapshots, &SnapshotCreateTime))[0] | DBSnapshotIdentifier" --output text)
@@ -73,8 +77,11 @@ do
 done
 
 # Stop new database instance (if aim is to save cost in non-prod)
-sleep(5)
+sleep 5
 echo
 echo "Stopping database $dbname ..."
 aws rds stop-db-instance --db-instance-identifier $dbname | grep -i "DBInstanceStatus"
 echo
+
+duration="Duration of script: $(($SECONDS / 3600))hrs $((($SECONDS / 60) % 60))min $(($SECONDS % 60))sec"
+echo $duration
