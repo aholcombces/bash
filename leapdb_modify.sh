@@ -1,6 +1,6 @@
 #!/bin/bash
 # written by: atholcomb
-# autorun.sh
+# leapdb_modify.sh
 # calls awscli - removes old database instance and restores a new database instance from a specified snapshot
 
 # save output in cron job to output file
