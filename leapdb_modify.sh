@@ -78,26 +78,30 @@ done
 # Enable Enhanced Monitoring on new database
 echo
 echo "Enabling Enhanced Monitoring on $newdb"
-aws rds modify-db-instance --db-instance-identifer $newdb --monitoring-role-arn arn:aws:iam::208766631402:role/leapdbreplica-emaccess --monitoring-interval 5 | grep -i "DBInstanceStatus"
-echo "Checking if $newdb has been properly modified..."
+aws rds modify-db-instance --db-instance-identifier $newdb --monitoring-role-arn arn:aws:iam::208766631402:role/leapdbreplica-emaccess --monitoring-interval 5 | grep -i "DBInstanceStatus"
+echo
+echo "Checking if Enhanced Monitoring is enabled on $newdb..."
 echo "This process can take a while. Please wait."
 echo
+sleep(5)
 while :
 do
     dbstatus=$(aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus")
     dbavailable=$(aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus" | grep -i "available")
     if [[ "$dbstatus" == $dbavailable ]]; then
-        echo "-------------------------------------"
-        echo "$newdb has been modified"
-        echo "------------------------------------"
+        echo "----------------------------------------------------------"
+        echo "Enhaced Monitoring has been enabled on $newdb"
+        echo "----------------------------------------------------------"
         break
     fi
 done
 
 # Enable Performance Insights on new database"
+echo
 echo "Enabling Performance Insights on $newdb"
 aws rds modify-db-instance --db-instance-identifier ces-leapdb-test --enable-performance-insights | grep -i "PerformanceInsightsEnabled"
-echo "Checking if $newdb has been properly modified..."
+echo
+echo "Checking if Performance Insights is enabled on $newdb..."
 echo "This process can take a while. Please wait."
 echo
 while :
@@ -105,14 +109,15 @@ do
     dbstatus=$(aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus")
     dbavailable=$(aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus" | grep -i "available")
     if [[ "$dbstatus" == $dbavailable ]]; then
-        echo "-------------------------------------"
-        echo "$newdb has been modified"
-        echo "------------------------------------"
+        echo "------------------------------------------------------------"
+        echo "Performance Insights has been enabled on $newdb"
+        echo "------------------------------------------------------------"
         break
     fi
 done
 
 # Check if new database is available
+echo
 echo "Checking if $newdb is available and online..."
 echo "This process can take a while. Please wait."
 echo
