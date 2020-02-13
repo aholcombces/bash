@@ -78,7 +78,7 @@ done
 # Enable Enhanced Monitoring on new database
 echo
 echo "Enabling Enhanced Monitoring on $newdb"
-aws rds modify-db-instance --db-instance-identifer ces-leapdb-test --monitoring-role-arn arn:aws:iam::208766631402:role/leapdbreplica-emaccess --monitoring-interval 5 | grep -i "DBInstanceStatus"
+aws rds modify-db-instance --db-instance-identifer $newdb --monitoring-role-arn arn:aws:iam::208766631402:role/leapdbreplica-emaccess --monitoring-interval 5 | grep -i "DBInstanceStatus"
 echo "Checking if $newdb has been properly modified..."
 echo "This process can take a while. Please wait."
 echo
