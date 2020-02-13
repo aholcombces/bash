@@ -12,17 +12,19 @@ SECONDS=0
 echo "Date ran: $(date)"
 echo
 
-dbname=$1
-newdb=$2
+dbname="ces-leapdb"
+newdb=$1
 latestsnapshot=$(aws rds describe-db-snapshots --db-instance-identifier=$dbname --query="reverse(sort_by(DBSnapshots, &SnapshotCreateTime))[0] | DBSnapshotIdentifier" --output text)
 
 # Check database status
-echo "Database status..."
+echo "$dbname database status..."
 aws rds describe-db-instances --db-instance-identifier $dbname | grep -i "DBInstanceStatus"
+echo "$newdb database status..."
+aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus"
 
 # Check snapshot info
 echo
-echo "Lastest snapshot info:"
+echo "Lastest snapshot info for $dbname:"
 aws rds describe-db-snapshots --db-snapshot-identifier $latestsnapshot | grep -i "InstanceCreateTime"
 aws rds describe-db-snapshots --db-snapshot-identifier $latestsnapshot | grep -i "SnapshotCreateTime"
 aws rds describe-db-snapshots --db-snapshot-identifier $latestsnapshot | grep -i "DBInstanceIdentifier"
@@ -84,4 +86,5 @@ done
 #echo
 
 duration="Duration of script: $(($SECONDS / 3600))hrs $((($SECONDS / 60) % 60))min $(($SECONDS % 60))sec"
+echo
 echo $duration
