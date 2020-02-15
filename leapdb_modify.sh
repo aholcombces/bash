@@ -3,9 +3,6 @@
 # leapdb_modify.sh
 # calls awscli - removes old database instance and restores a new database instance from a specified snapshot
 
-# save output in cron job to output file
-# /path/to/your/script.sh &> output.txt
-
 # Configure $HOME variable for aws config file to be read in
 export HOME=/root
 
@@ -136,7 +133,7 @@ do
     fi
 done
 
-# Report how long the script to execute
+# Report how long the script took to execute
 duration="Duration of script: $(($SECONDS / 3600))hrs $((($SECONDS / 60) % 60))min $(($SECONDS % 60))sec"
 echo
 echo $duration
