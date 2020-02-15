@@ -54,16 +54,13 @@ do
 done
 
 # Restore database from snapshot
-# --db-subnet-group-name
-# --vpc-security-group-ids
-# --availability-zone us-east-2b
 echo
 echo "Creating ces-leapdb-test from restored snapshot id: $latestsnapshot"
 aws rds restore-db-instance-from-db-snapshot --db-snapshot-identifier $latestsnapshot --db-subnet-group-name ces-prd-stack-dbsubnetgroup-f72doe140v1l --vpc-security-group-ids sg-03b91652619d09223 --db-instance-class db.t2.micro --db-instance-identifier $newdb | grep -i "DBInstanceStatus"
 echo
 
 # Check if new database is available
-echo "Checking if ces-leapdb-test is available and online..."
+echo "Checking if $newdb is available and online..."
 echo "This process can take a while. Please wait."
 echo
 while :
@@ -78,13 +75,65 @@ do
     fi
 done
 
-# Stop new database instance (if aim is to save cost in non-prod)
-#sleep 5
-#echo
-#echo "Stopping database $dbname ..."
-#aws rds stop-db-instance --db-instance-identifier $dbname | grep -i "DBInstanceStatus"
-#echo
+# Enable Enhanced Monitoring on new database
+echo
+echo "Enabling Enhanced Monitoring on $newdb"
+aws rds modify-db-instance --db-instance-identifier $newdb --monitoring-role-arn arn:aws:iam::208766631402:role/leapdbreplica-emaccess --monitoring-interval 5 | grep -i "DBInstanceStatus"
+echo
+echo "Checking if Enhanced Monitoring is enabled on $newdb..."
+echo "This process can take a while. Please wait."
+echo
+sleep(5)
+while :
+do
+    dbstatus=$(aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus")
+    dbavailable=$(aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus" | grep -i "available")
+    if [[ "$dbstatus" == $dbavailable ]]; then
+        echo "----------------------------------------------------------"
+        echo "Enhaced Monitoring has been enabled on $newdb"
+        echo "----------------------------------------------------------"
+        break
+    fi
+done
 
+# Enable Performance Insights on new database"
+echo
+echo "Enabling Performance Insights on $newdb"
+aws rds modify-db-instance --db-instance-identifier ces-leapdb-test --enable-performance-insights | grep -i "PerformanceInsightsEnabled"
+echo
+echo "Checking if Performance Insights is enabled on $newdb..."
+echo "This process can take a while. Please wait."
+echo
+while :
+do
+    dbstatus=$(aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus")
+    dbavailable=$(aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus" | grep -i "available")
+    if [[ "$dbstatus" == $dbavailable ]]; then
+        echo "------------------------------------------------------------"
+        echo "Performance Insights has been enabled on $newdb"
+        echo "------------------------------------------------------------"
+        break
+    fi
+done
+
+# Check if new database is available
+echo
+echo "Checking if $newdb is available and online..."
+echo "This process can take a while. Please wait."
+echo
+while :
+do
+    dbstatus=$(aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus")
+    dbavailable=$(aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus" | grep -i "available")
+    if [[ "$dbstatus" == $dbavailable ]]; then
+        echo "-----------------------------"
+        echo "$newdb is available"
+        echo "-----------------------------"
+        break
+    fi
+done
+
+# Report how long the script to execute
 duration="Duration of script: $(($SECONDS / 3600))hrs $((($SECONDS / 60) % 60))min $(($SECONDS % 60))sec"
 echo
 echo $duration
