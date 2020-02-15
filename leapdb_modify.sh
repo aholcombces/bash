@@ -49,9 +49,9 @@ while :
 do
     dboutput=$(aws rds describe-db-instances --query 'DBInstances[*].[DBName,DBInstanceIdentifier]' --filters Name=db-instance-id,Values=$newdb --output text)
     if  [ "$dboutput" == '' ]; then 
-        echo "--------------------------------"
+        echo "--------------------------------------"
         echo "$newdb has been removed."
-        echo "--------------------------------"
+        echo "--------------------------------------"
         break
     fi 
 done
@@ -71,9 +71,9 @@ do
     dbstatus=$(aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus")
     dbavailable=$(aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus" | grep -i "available")
     if [[ "$dbstatus" == $dbavailable ]]; then
-        echo "-----------------------------"
+        echo "--------------------------------"
         echo "$newdb is available"
-        echo "-----------------------------"
+        echo "--------------------------------"
         break
     fi
 done
@@ -129,9 +129,9 @@ do
     dbstatus=$(aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus")
     dbavailable=$(aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus" | grep -i "available")
     if [[ "$dbstatus" == $dbavailable ]]; then
-        echo "-----------------------------"
+        echo "--------------------------------"
         echo "$newdb is available"
-        echo "-----------------------------"
+        echo "--------------------------------"
         break
     fi
 done
