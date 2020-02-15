@@ -6,7 +6,7 @@
 # save output in cron job to output file
 # /path/to/your/script.sh &> output.txt
 
-# Specifiy $PATH variable so config file can be read
+# Specifiy $HOME variable so config file can be read
 export HOME=/root
 
 # Measure the time the script takes to run -- look at $duration below
