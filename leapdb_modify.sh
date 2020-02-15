@@ -6,6 +6,9 @@
 # save output in cron job to output file
 # /path/to/your/script.sh &> output.txt
 
+# Configure $HOME variable for aws config file to be read in
+export HOME=/root
+
 # Measure the time the script takes to run -- look at $duration below
 SECONDS=0
 
@@ -56,7 +59,7 @@ done
 # Restore database from snapshot
 echo
 echo "Creating ces-leapdb-test from restored snapshot id: $latestsnapshot"
-aws rds restore-db-instance-from-db-snapshot --db-snapshot-identifier $latestsnapshot --db-subnet-group-name ces-prd-stack-dbsubnetgroup-f72doe140v1l --vpc-security-group-ids sg-03b91652619d09223 --db-instance-class db.t2.micro --db-instance-identifier $newdb | grep -i "DBInstanceStatus"
+aws rds restore-db-instance-from-db-snapshot --db-snapshot-identifier $latestsnapshot --db-subnet-group-name ces-prd-stack-dbsubnetgroup-f72doe140v1l --vpc-security-group-ids sg-03b91652619d09223 sg-04dd1ad63f4b60a67 --db-instance-class db.t2.medium --db-instance-identifier $newdb | grep -i "DBInstanceStatus"
 echo
 
 # Check if new database is available
@@ -83,7 +86,7 @@ echo
 echo "Checking if Enhanced Monitoring is enabled on $newdb..."
 echo "This process can take a while. Please wait."
 echo
-sleep(5)
+sleep 5
 while :
 do
     dbstatus=$(aws rds describe-db-instances --db-instance-identifier $newdb | grep -i "DBInstanceStatus")
@@ -99,7 +102,7 @@ done
 # Enable Performance Insights on new database"
 echo
 echo "Enabling Performance Insights on $newdb"
-aws rds modify-db-instance --db-instance-identifier ces-leapdb-test --enable-performance-insights | grep -i "PerformanceInsightsEnabled"
+aws rds modify-db-instance --db-instance-identifier $newdb --enable-performance-insights | grep -i "PerformanceInsightsEnabled"
 echo
 echo "Checking if Performance Insights is enabled on $newdb..."
 echo "This process can take a while. Please wait."
